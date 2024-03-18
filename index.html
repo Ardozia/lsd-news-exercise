@@ -41,7 +41,6 @@
         .maisInfo {
             background-color: rgba(0, 0, 0, 0.5);
         }
-
     </style>
 
 </head>
@@ -52,13 +51,13 @@
     <div class="container d-flex vh-100 ">
         <div class="align-self-sm-center w-100 animate__animated animate__fadeInDown animate__faster">
             <h1 class="display-2 fw-bold text-secondary mx-0">NEWS</h1>
-            <div class="row g-0">
+            <div class="row gap-2">
                 <div class="cell1 cell col-sm">
                     <div class="maisInfo h-100 w-100 position-absolute top-0 start-0 text-center">
                         <button class=" btn btn-dark btn-lg mt-5">more</button>
                     </div>
                 </div>
-                <div class="cell2 cell col-sm mx-sm-2 my-2 my-sm-0">
+                <div class="cell2 cell col-sm ">
                     <div class="maisInfo h-100 w-100 position-absolute top-0 start-0 text-center">
                         <button class=" btn btn-dark btn-lg mt-5">more</button>
                     </div>
@@ -88,11 +87,13 @@
 
             function onMouseEnter() {
                 // apresentar a div maisInfo que está dentro da cell que tem o rato
+                $(this).find(".maisInfo").stop()
                 $(this).find(".maisInfo").fadeIn("fast");
             }
 
             function onMouseLeave() {
                 // esconder o maisInfo
+                $(this).find(".maisInfo").stop()
                 $(this).find(".maisInfo").fadeOut("fast");
             }
 
