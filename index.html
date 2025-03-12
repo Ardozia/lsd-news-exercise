@@ -13,7 +13,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@100;300&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css" />
-
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <style type="text/css">
         * {
             font-family: Helvetica;
@@ -38,8 +38,9 @@
             background-image: url("./images/news3.png");
         }
 
-        .maisInfo {
+        .cell div {
             background-color: rgba(0, 0, 0, 0.5);
+            color: white
         }
     </style>
 
@@ -51,20 +52,34 @@
     <div class="container d-flex vh-100 ">
         <div class="align-self-sm-center w-100 animate__animated animate__fadeInDown animate__faster">
             <h1 class="display-2 fw-bold text-secondary mx-0">NEWS</h1>
+
+            <div>
+                <form class="row mb-3">
+                    <div class="col-2">
+                        <input type="text" class="form-control dateNews" />
+                    </div>
+                    <div class="col">
+                        <button type="button" class="btn btn-primary updateNews">Atualizar</button>
+                    </div>
+                </form>
+            </div>
             <div class="row gap-2">
                 <div class="cell1 cell col-sm">
-                    <div class="maisInfo h-100 w-100 position-absolute top-0 start-0 text-center">
-                        <button class=" btn btn-dark btn-lg mt-5">more</button>
+                    <div class="bbc h-100 w-100 position-absolute top-0 start-0 text-center">
+                        <a class="btn btn-dark btn-lg mt-5" href="http://www.bbc.com/">Visit</a>
+                        <div class="articles"></div>
                     </div>
                 </div>
                 <div class="cell2 cell col-sm ">
-                    <div class="maisInfo h-100 w-100 position-absolute top-0 start-0 text-center">
-                        <button class=" btn btn-dark btn-lg mt-5">more</button>
+                    <div class="fox h-100 w-100 position-absolute top-0 start-0 text-center">
+                        <a class="btn btn-dark btn-lg mt-5" href="https://www.foxnews.com/">Visit</a>
+                        <div class="articles"></div>
                     </div>
                 </div>
                 <div class="cell3 cell col-sm">
-                    <div class="maisInfo h-100 w-100 position-absolute top-0 start-0 text-center">
-                        <button class=" btn btn-dark btn-lg mt-5">more</button>
+                    <div class="abc h-100 w-100 position-absolute top-0 start-0 text-center">
+                        <a class="btn btn-dark btn-lg mt-5" href="http://www.bbc.com/">Visit</a>
+                        <div class="articles"></div>
                     </div>
                 </div>
             </div>
@@ -72,32 +87,114 @@
 
     </div>
 
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="liveToast" class="toast" role="alert" aria-live="assertive" aria-atomic="true">
+            <div class="toast-header">
+                <strong class="me-auto">News service</strong>
+                <button type="button" class="btn-close" data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+            <div class="toast-body">
+                ...
+            </div>
+        </div>
+    </div>
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.3/dist/js/bootstrap.bundle.min.js"
         integrity="sha384-kenU1KFdBIe4zVF0s0G1M5b4hcpxyD9F7jL+jjXkk+Q2h455rYXK/7HAuoJl+0I4"
         crossorigin="anonymous"></script>
     <script type="text/javascript" src="http://code.jquery.com/jquery-latest.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+
     <script type="text/javascript">
 
         $(document).ready(function () {
 
-            $(".maisInfo").hide();
+            $(".cell div").hide();
 
             $(".cell").mouseenter(onMouseEnter);
             $(".cell").mouseleave(onMouseLeave);
 
             function onMouseEnter() {
-                // apresentar a div maisInfo que está dentro da cell que tem o rato
-                $(this).find(".maisInfo").stop()
-                $(this).find(".maisInfo").fadeIn("fast");
+                // apresentar a div que está dentro da cell que tem o rato
+                $(this).find("div").stop()
+                $(this).find("div").fadeIn("fast");
             }
 
             function onMouseLeave() {
-                // esconder o maisInfo
-                $(this).find(".maisInfo").stop()
-                $(this).find(".maisInfo").fadeOut("fast");
+                // esconder a div que está dentro da cell que tem o rato
+                $(this).find("div").stop()
+                $(this).find("div").fadeOut("fast");
             }
 
+            // create datepicker component
+            flatpickr(".dateNews", {
+                dateFormat: "Y-m-d"
+            })
+
         });
+
+        $('.updateNews').on("click", function (e) {
+            if ($(".dateNews").val() == "") {
+                $(".toast-body").text("Por favor seleccione uma data")
+                toastObject.show()
+                return
+            }
+
+            let selectedDate = $(".dateNews").val()
+            let url = "https://newsapi.org/v2/everything?sources=bbc-news&from=" + selectedDate + "&to=" + selectedDate + "&sortBy=popularity&pageSize=3&apiKey=80572a39fc6b493896533e91a86b4b25"
+            console.log(url)
+
+            // remove previous news
+            $('.articles').empty()
+
+            // GET news from API
+            $.ajax({
+                url: url,
+                success: function (result) {
+                    // update news
+                    updateNews('.bbc', result.articles)
+                }
+            });
+            url = "https://newsapi.org/v2/everything?sources=fox-news&from=" + selectedDate + "&to=" + selectedDate + "&sortBy=popularity&pageSize=3&apiKey=80572a39fc6b493896533e91a86b4b25"
+            $.ajax({
+                url: url,
+                success: function (result) {
+                    // update news
+                    updateNews('.fox', result.articles)
+                }
+            });
+            url = "https://newsapi.org/v2/everything?sources=abc-news&from=" + selectedDate + "&to=" + selectedDate + "&sortBy=popularity&pageSize=3&apiKey=80572a39fc6b493896533e91a86b4b25"
+            $.ajax({
+                url: url,
+                success: function (result) {
+                    // update news
+                    updateNews('.abc', result.articles)
+
+                    // apresenta toast
+                    // 1. aceder div .toast-body
+                    // 2. [data] = aceder ao value do .dateNews
+                    // 3. Criar mensagem "Noticias atualizada a [data]-> escrever a mensagem no .toast-body
+                    $(".toast-body").text("Noticias atualizadas a " + $(".dateNews").val())
+                    toastObject.show()
+
+
+                }
+            });
+
+        })
+
+        const updateNews = (parent, articles) => {
+            articles.forEach(article => {
+                $(`${parent} .articles`).append(`<p><a class="link-light" target="_blank" href="${article.url}">${article.title}</a></p>`)
+            });
+        }
+
+        const toastDiv = $("#liveToast")
+        const toastObject = bootstrap.Toast.getOrCreateInstance(toastDiv)
+
+        // News API_KEY=80572a39fc6b493896533e91a86b4b25
+
 
     </script>
 </body>
